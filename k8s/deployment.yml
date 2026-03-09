@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-app-deployment # Name of this deployment
+  labels:
+    app: flask-app
+spec:
+  replicas: 2 # Run 2 copies of our app for reliability
+  selector:
+    matchLabels:
+      app: flask-app # This deployment manages pods with this label
+  template:
+    metadata:
+      labels:
+        app: flask-app # Label on each pod
+    spec:
+      containers:
+        - name: flask-container
+          image: YOUR_DOCKERHUB_USERNAME/flask-app:latest # Replace with your username!
+          ports:
+            - containerPort: 5000 # Port our app listens on
+          env:
+            - name: FLASK_ENV
+              value: production
+          resources:
+            requests:
+              memory: "128Mi" # Minimum memory needed
+              cpu: "100m" # 100 millicores = 0.1 CPU
+            limits:
+              memory: "256Mi" # Maximum memory allowed
+              cpu: "500m" # Maximum CPU allowed
+          livenessProbe:
+            httpGet:
+              path: /health # Kubernetes checks this endpoint
+              port: 5000
+            initialDelaySeconds: 15 # Wait 15s before first check
+            periodSeconds: 20 # Check every 20 seconds
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-app-service # Name of this service
+spec:
+  selector:
+    app: flask-app # Routes traffic to pods with this label
+  ports:
+    - protocol: TCP
+      port: 80 # External port (what users access)
+      targetPort: 5000 # Internal port (what Flask runs on)
+  type:
+    NodePort # Makes the service accessible from outside the cluster
+    # Use LoadBalancer if on cloud (AWS/GCP/Azure)
